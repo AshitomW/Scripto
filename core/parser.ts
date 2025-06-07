@@ -36,7 +36,6 @@ export default class Parser {
     while (this.notEOF()) {
       program.body.push(this.parse_statement());
     }
-
     return program;
   }
 
@@ -79,13 +78,29 @@ export default class Parser {
 
   private parse_multiplicative_expression(): Expression {
     // Left Precedance : 10+5-5
-    let left = this.parse_primary_expression();
+    let left = this.parse_exponential_expression();
 
     while (
       this.getCurrentToken().value == "*" ||
       this.getCurrentToken().value == "/" ||
       this.getCurrentToken().value == "%"
     ) {
+      const operator = this.eat().value;
+      const right = this.parse_exponential_expression();
+      left = {
+        kind: "Binary Expression",
+        left,
+        right,
+        operator,
+      } as BinaryExpression;
+    }
+
+    return left;
+  }
+
+  private parse_exponential_expression(): Expression {
+    let left = this.parse_primary_expression();
+    while (this.getCurrentToken().value == "^") {
       const operator = this.eat().value;
       const right = this.parse_primary_expression();
       left = {
@@ -95,7 +110,6 @@ export default class Parser {
         operator,
       } as BinaryExpression;
     }
-
     return left;
   }
 

@@ -51,6 +51,7 @@ export function Tokenize(source_code: string): Token[] {
       case "*":
       case "/":
       case "%":
+      case "^":
         tokens.push(make_token(src.shift(), TokenType.BinaryOperator));
         break;
       case "=":

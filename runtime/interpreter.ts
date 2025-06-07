@@ -57,6 +57,12 @@ function interpret_numeric_binary_expression(
     case "%":
       accumulator = lh.value % rh.value;
       break;
+    case "^":
+      accumulator = lh.value;
+      for (let i = 1; i < rh.value; i++) {
+        accumulator *= lh.value;
+      }
+      break;
     default:
       break;
   }
