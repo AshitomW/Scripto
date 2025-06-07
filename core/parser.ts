@@ -102,7 +102,7 @@ export default class Parser {
     let left = this.parse_primary_expression();
     while (this.getCurrentToken().value == "^") {
       const operator = this.eat().value;
-      const right = this.parse_primary_expression();
+      const right = this.parse_exponential_expression();
       left = {
         kind: "Binary Expression",
         left,
