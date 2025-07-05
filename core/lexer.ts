@@ -14,12 +14,12 @@ export enum TokenType {
   ParenClose,
   BinaryOperator,
   // Keywords ??
-  BET,
+  LET,
   EOF, // End Of File
 }
 
 const KEYWORDS: Record<string, TokenType> = {
-  let: TokenType.BET,
+  let: TokenType.LET,
   null: TokenType.NULL,
 };
 
