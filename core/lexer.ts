@@ -8,18 +8,21 @@ export enum TokenType {
   Number,
   Identifier,
   StringLiteral,
-  // Operations?
+  // GROUPS & OPERATORS
   Equals,
   ParenOpen,
   ParenClose,
   BinaryOperator,
+  SEMICOLON,
   // Keywords ??
   LET,
+  CONST,
   EOF, // End Of File
 }
 
 const KEYWORDS: Record<string, TokenType> = {
   let: TokenType.LET,
+  const: TokenType.CONST,
 };
 
 export interface Token {
@@ -55,6 +58,9 @@ export function Tokenize(source_code: string): Token[] {
         break;
       case "=":
         tokens.push(make_token(src.shift(), TokenType.Equals));
+        break;
+      case ";":
+        tokens.push(make_token(src.shift(), TokenType.SEMICOLON));
         break;
       default:
         // Handle Multiple Characters Token , <= , -> , let

@@ -5,6 +5,7 @@ import {
   BinaryExpression,
   NumericLiteral,
   Identifier,
+  VariableDeclaration,
 } from "./ast";
 import { Tokenize, Token, TokenType } from "./lexer";
 
@@ -39,7 +40,56 @@ export default class Parser {
   }
 
   private parse_statement(): Statement {
-    return this.parse_expression();
+    switch (this.getCurrentToken().type) {
+      case TokenType.LET:
+      case TokenType.CONST:
+        return this.parse_variable_declaration();
+
+      default:
+        return this.parse_expression();
+    }
+  }
+
+  private parse_variable_declaration(): Statement {
+    // (const | let) identifier = expression;
+    const isConstant = this.eat().type == TokenType.CONST;
+    const identifier = this.expect(
+      TokenType.Identifier,
+      "Expecting Identifier Name Following Declaration Keywords",
+    ).value;
+
+    if (this.getCurrentToken().type == TokenType.SEMICOLON) {
+      this.eat();
+      if (isConstant) {
+        throw "Illegal Declaration; constants must be assigned a value";
+      }
+
+      return {
+        kind: "VariableDeclaration",
+        identifier,
+        constant: false,
+        value: undefined,
+      } as VariableDeclaration;
+    }
+
+    this.expect(
+      TokenType.Equals,
+      "Expected Equals Token Following Identifier In Variable Declaration",
+    );
+
+    const declr = {
+      kind: "VariableDeclaration",
+      value: this.parse_expression(),
+      identifier,
+      constant: isConstant,
+    } as VariableDeclaration;
+
+    this.expect(
+      TokenType.SEMICOLON,
+      "Statements must be terminated with semicolons",
+    );
+
+    return declr;
   }
 
   private parse_expression(): Expression {

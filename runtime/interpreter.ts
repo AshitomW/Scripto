@@ -13,8 +13,10 @@ import {
   NumericLiteral,
   Program,
   Statement,
+  VariableDeclaration,
 } from "../core/ast";
 import Environment from "./environment";
+import { Runtime } from "inspector/promises";
 
 function interpret_program(program: Program, env: Environment): RuntimeValue {
   let lastEvaluated: RuntimeValue = M_NULL();
@@ -86,6 +88,14 @@ export function interpret_identifier(
   return val;
 }
 
+export function interpret_variable_declaration(
+  declr: VariableDeclaration,
+  env: Environment,
+): RuntimeValue {
+  const value = declr.value ? interpret(declr.value, env) : M_NULL();
+  return env.declareVariable(declr.identifier, value, declr.constant);
+}
+
 export function interpret(ASTNode: Statement, env: Environment): RuntimeValue {
   switch (ASTNode.kind) {
     case "Numeric Literal":
@@ -96,8 +106,16 @@ export function interpret(ASTNode: Statement, env: Environment): RuntimeValue {
       break;
     case "Identifier":
       return interpret_identifier(ASTNode as Identifier, env);
+      break;
     case "Program":
       return interpret_program(ASTNode as Program, env);
+      break;
+    case "VariableDeclaration":
+      return interpret_variable_declaration(
+        ASTNode as VariableDeclaration,
+        env,
+      );
+      break;
     default:
       console.log("This Ast Node Has Not Been Setup For Interpretation");
       process.exit();
