@@ -7,6 +7,7 @@ import {
   M_NUMBER,
 } from "./values";
 import {
+  AssignmentExpression,
   BinaryExpression,
   Identifier,
   NodeType,
@@ -96,6 +97,18 @@ export function interpret_variable_declaration(
   return env.declareVariable(declr.identifier, value, declr.constant);
 }
 
+export function interpret_assignment(
+  node: AssignmentExpression,
+  env: Environment,
+): RuntimeValue {
+  if (node.assignee.kind !== "Identifier")
+    throw `Invalid LHS Assignment! ${JSON.stringify(node.assignee)}`;
+
+  const varname = (node.assignee as Identifier).symbol;
+
+  return env.assignVariable(varname, interpret(node.value, env));
+}
+
 export function interpret(ASTNode: Statement, env: Environment): RuntimeValue {
   switch (ASTNode.kind) {
     case "Numeric Literal":
@@ -115,6 +128,9 @@ export function interpret(ASTNode: Statement, env: Environment): RuntimeValue {
         ASTNode as VariableDeclaration,
         env,
       );
+      break;
+    case "AssignmentExpression":
+      return interpret_assignment(ASTNode as AssignmentExpression, env);
       break;
     default:
       console.log("This Ast Node Has Not Been Setup For Interpretation");

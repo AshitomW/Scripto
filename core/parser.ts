@@ -6,6 +6,7 @@ import {
   NumericLiteral,
   Identifier,
   VariableDeclaration,
+  AssignmentExpression,
 } from "./ast";
 import { Tokenize, Token, TokenType } from "./lexer";
 
@@ -93,7 +94,22 @@ export default class Parser {
   }
 
   private parse_expression(): Expression {
-    return this.parse_additive_expression();
+    return this.parse_assignment_expression();
+  }
+
+  private parse_assignment_expression(): Expression {
+    const left = this.parse_additive_expression();
+    if (this.getCurrentToken().type == TokenType.Equals) {
+      this.eat();
+      const value = this.parse_assignment_expression();
+      return {
+        value,
+        assignee: left,
+        kind: "AssignmentExpression",
+      } as AssignmentExpression;
+    }
+
+    return left;
   }
   private expect(type: TokenType, err: any) {
     const prev = this.tokens.shift() as Token;

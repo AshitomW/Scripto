@@ -13,6 +13,13 @@ const rl = readline.createInterface({
 function repl() {
   const parser = new Parser();
   const env = new Environment();
+
+  // default constants
+
+  env.declareVariable("true", M_BOOL(true), true);
+  env.declareVariable("false", M_BOOL(false), true);
+  env.declareVariable("null", M_NULL(), true);
+
   console.log("Scripto Lang Test: V1");
   function ask(): void {
     rl.question(">> ", (input: string) => {
