@@ -5,7 +5,6 @@ import {
   BinaryExpression,
   NumericLiteral,
   Identifier,
-  NullLiteral,
 } from "./ast";
 import { Tokenize, Token, TokenType } from "./lexer";
 
@@ -136,10 +135,6 @@ export default class Parser {
           "Unexpected Token Found Inside Parenthesised Expression. Expected Closing Parenthesis",
         ); // Remove the closing parenthesis;
         return value;
-      case TokenType.NULL:
-        this.eat(); // move ahead of the null keyword;
-        return { kind: "Null Literal", value: "null" } as NullLiteral;
-        break;
       default:
         console.error(
           "Unexpected Token Found During Parsing",

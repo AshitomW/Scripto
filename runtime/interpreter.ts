@@ -1,28 +1,37 @@
-import { ValueType, RuntimeValue, NumberValue, NullValue } from "./values";
+import {
+  ValueType,
+  RuntimeValue,
+  NumberValue,
+  NullValue,
+  M_NULL,
+  M_NUMBER,
+} from "./values";
 import {
   BinaryExpression,
+  Identifier,
   NodeType,
   NumericLiteral,
   Program,
   Statement,
 } from "../core/ast";
+import Environment from "./environment";
 
-function interpret_program(program: Program): RuntimeValue {
-  let lastEvaluated: RuntimeValue = {
-    type: "null",
-    value: "null",
-  } as NullValue;
+function interpret_program(program: Program, env: Environment): RuntimeValue {
+  let lastEvaluated: RuntimeValue = M_NULL();
 
   for (const statement of program.body) {
-    lastEvaluated = interpret(statement);
+    lastEvaluated = interpret(statement, env);
   }
 
   return lastEvaluated;
 }
 
-function interpret_binary_expression(binExp: BinaryExpression): RuntimeValue {
-  const lh = interpret(binExp.left);
-  const rh = interpret(binExp.right);
+function interpret_binary_expression(
+  binExp: BinaryExpression,
+  env: Environment,
+): RuntimeValue {
+  const lh = interpret(binExp.left, env);
+  const rh = interpret(binExp.right, env);
 
   const validExpression = lh.type == "number" && rh.type == "number";
   if (validExpression) {
@@ -32,7 +41,7 @@ function interpret_binary_expression(binExp: BinaryExpression): RuntimeValue {
       binExp.operator,
     );
   }
-  return { type: "null", value: "null" } as NullValue;
+  return M_NULL() as NullValue;
 }
 
 function interpret_numeric_binary_expression(
@@ -69,22 +78,26 @@ function interpret_numeric_binary_expression(
   return { value: accumulator, type: "number" };
 }
 
-export function interpret(ASTNode: Statement): RuntimeValue {
+export function interpret_identifier(
+  idt: Identifier,
+  env: Environment,
+): RuntimeValue {
+  const val = env.lookUpVariable(idt.symbol);
+  return val;
+}
+
+export function interpret(ASTNode: Statement, env: Environment): RuntimeValue {
   switch (ASTNode.kind) {
     case "Numeric Literal":
-      return {
-        value: (ASTNode as NumericLiteral).value,
-        type: "number",
-      } as NumberValue;
-      break;
-    case "Null Literal":
-      return { value: "null", type: "null" } as NullValue;
+      return M_NUMBER((ASTNode as NumericLiteral).value);
       break;
     case "Binary Expression":
-      return interpret_binary_expression(ASTNode as BinaryExpression);
+      return interpret_binary_expression(ASTNode as BinaryExpression, env);
       break;
+    case "Identifier":
+      return interpret_identifier(ASTNode as Identifier, env);
     case "Program":
-      return interpret_program(ASTNode as Program);
+      return interpret_program(ASTNode as Program, env);
     default:
       console.log("This Ast Node Has Not Been Setup For Interpretation");
       process.exit();

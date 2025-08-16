@@ -7,7 +7,7 @@ export enum TokenType {
   // Types?
   Number,
   Identifier,
-  NULL,
+  StringLiteral,
   // Operations?
   Equals,
   ParenOpen,
@@ -20,7 +20,6 @@ export enum TokenType {
 
 const KEYWORDS: Record<string, TokenType> = {
   let: TokenType.LET,
-  null: TokenType.NULL,
 };
 
 export interface Token {

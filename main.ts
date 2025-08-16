@@ -2,6 +2,8 @@ import Parser from "./core/parser";
 import { inspect } from "util";
 import readline from "readline";
 import { interpret } from "./runtime/interpreter";
+import Environment from "./runtime/environment";
+import { M_BOOL, M_NULL, M_NUMBER, NumberValue } from "./runtime/values";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -10,6 +12,10 @@ const rl = readline.createInterface({
 
 function repl() {
   const parser = new Parser();
+  const env = new Environment();
+  env.declareVariable("x", M_NUMBER(200));
+  env.declareVariable("true", M_BOOL(true));
+  env.declareVariable("null", M_NULL());
   console.log("Scripto Lang Test: V1");
   function ask(): void {
     rl.question(">> ", (input: string) => {
@@ -20,9 +26,9 @@ function repl() {
 
       const program = parser.generateAST(input);
       console.log(
-        inspect(program, { showHidden: false, depth: null, colors: true })
+        inspect(program, { showHidden: false, depth: null, colors: true }),
       );
-      const result = interpret(program);
+      const result = interpret(program, env);
       console.log(result);
       ask(); // loop again
     });
