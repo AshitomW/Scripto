@@ -1,4 +1,10 @@
-import { RuntimeValue } from "./values";
+import { M_BOOL, M_NULL, RuntimeValue } from "./values";
+
+function setupScope(env: Environment) {
+  env.declareVariable("true", M_BOOL(true), true);
+  env.declareVariable("false", M_BOOL(false), true);
+  env.declareVariable("null", M_NULL(), true);
+}
 
 // Hold structure for scopes
 export default class Environment {
@@ -6,9 +12,14 @@ export default class Environment {
   private variables: Map<string, RuntimeValue>;
   private constants: Set<string>;
   constructor(parentEnv?: Environment) {
+    const global = parentEnv ? true : false;
     this.parent = parentEnv;
     this.variables = new Map();
     this.constants = new Set();
+
+    if (global) {
+      setupScope(this);
+    }
   }
 
   public declareVariable(

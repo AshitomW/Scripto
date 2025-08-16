@@ -1,23 +1,20 @@
 import {
-  ValueType,
-  RuntimeValue,
-  NumberValue,
-  NullValue,
-  M_NULL,
-  M_NUMBER,
-} from "./values";
-import {
   AssignmentExpression,
   BinaryExpression,
   Identifier,
-  NodeType,
   NumericLiteral,
   Program,
   Statement,
   VariableDeclaration,
 } from "../core/ast";
 import Environment from "./environment";
-import { Runtime } from "inspector/promises";
+import { interpret_binary_expression } from "./interpreters/expression";
+import {
+  interpret_assignment,
+  interpret_identifier,
+  interpret_variable_declaration,
+} from "./interpreters/variables";
+import { M_NULL, M_NUMBER, RuntimeValue } from "./values";
 
 function interpret_program(program: Program, env: Environment): RuntimeValue {
   let lastEvaluated: RuntimeValue = M_NULL();
@@ -27,86 +24,6 @@ function interpret_program(program: Program, env: Environment): RuntimeValue {
   }
 
   return lastEvaluated;
-}
-
-function interpret_binary_expression(
-  binExp: BinaryExpression,
-  env: Environment,
-): RuntimeValue {
-  const lh = interpret(binExp.left, env);
-  const rh = interpret(binExp.right, env);
-
-  const validExpression = lh.type == "number" && rh.type == "number";
-  if (validExpression) {
-    return interpret_numeric_binary_expression(
-      lh as NumberValue,
-      rh as NumberValue,
-      binExp.operator,
-    );
-  }
-  return M_NULL() as NullValue;
-}
-
-function interpret_numeric_binary_expression(
-  lh: NumberValue,
-  rh: NumberValue,
-  operator: string,
-): NumberValue {
-  let accumulator = 0;
-  switch (operator) {
-    case "+":
-      accumulator = lh.value + rh.value;
-      break;
-    case "-":
-      accumulator = lh.value - rh.value;
-      break;
-    case "*":
-      accumulator = lh.value * rh.value;
-      break;
-    case "/":
-      accumulator = lh.value / rh.value;
-      break;
-    case "%":
-      accumulator = lh.value % rh.value;
-      break;
-    case "^":
-      accumulator = lh.value;
-      for (let i = 1; i < rh.value; i++) {
-        accumulator *= lh.value;
-      }
-      break;
-    default:
-      break;
-  }
-  return { value: accumulator, type: "number" };
-}
-
-export function interpret_identifier(
-  idt: Identifier,
-  env: Environment,
-): RuntimeValue {
-  const val = env.lookUpVariable(idt.symbol);
-  return val;
-}
-
-export function interpret_variable_declaration(
-  declr: VariableDeclaration,
-  env: Environment,
-): RuntimeValue {
-  const value = declr.value ? interpret(declr.value, env) : M_NULL();
-  return env.declareVariable(declr.identifier, value, declr.constant);
-}
-
-export function interpret_assignment(
-  node: AssignmentExpression,
-  env: Environment,
-): RuntimeValue {
-  if (node.assignee.kind !== "Identifier")
-    throw `Invalid LHS Assignment! ${JSON.stringify(node.assignee)}`;
-
-  const varname = (node.assignee as Identifier).symbol;
-
-  return env.assignVariable(varname, interpret(node.value, env));
 }
 
 export function interpret(ASTNode: Statement, env: Environment): RuntimeValue {
