@@ -1,7 +1,8 @@
 // Define the types that are used for runtime.
 import { Runtime } from "inspector/promises";
+import Environment from "./environment";
 
-export type ValueType = "null" | "number" | "boolean" | "object";
+export type ValueType = "null" | "number" | "boolean" | "object" | "NFunc";
 
 export interface RuntimeValue {
   type: ValueType;
@@ -39,4 +40,18 @@ export function M_BOOL(b = false) {
     type: "boolean",
     value: b,
   } as BooleanValue;
+}
+
+export type FunctionCall = (
+  args: RuntimeValue[],
+  env: Environment,
+) => RuntimeValue;
+
+export interface NativeFunctionValue extends RuntimeValue {
+  type: "NFunc";
+  call: FunctionCall;
+}
+
+export function M_NATIVE_FUNC(call: FunctionCall) {
+  return { type: "NFunc", call } as NativeFunctionValue;
 }

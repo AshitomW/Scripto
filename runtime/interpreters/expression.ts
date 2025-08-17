@@ -1,8 +1,13 @@
-import { BinaryExpression, ObjectLiteral } from "../../core/ast";
+import {
+  BinaryExpression,
+  CallExpression,
+  ObjectLiteral,
+} from "../../core/ast";
 import Environment from "../environment";
 import { interpret } from "../interpreter";
 import {
   M_NULL,
+  NativeFunctionValue,
   NullValue,
   NumberValue,
   ObjectValue,
@@ -74,4 +79,19 @@ export function interpret_object_expression(
   }
 
   return object;
+}
+export function interpret_call_expression(
+  expr: CallExpression,
+  env: Environment,
+): RuntimeValue {
+  const args = expr.arguments.map((arg) => interpret(arg, env));
+  const fn = interpret(expr.caller, env);
+
+  if (fn.type !== "NFunc") {
+    throw "Cannot Call Value That Is Not A Function" + JSON.stringify(fn);
+  }
+
+  const result = (fn as NativeFunctionValue).call(args, env);
+
+  return M_NULL();
 }

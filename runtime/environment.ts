@@ -1,4 +1,4 @@
-import { M_BOOL, M_NULL, RuntimeValue } from "./values";
+import { M_BOOL, M_NATIVE_FUNC, M_NULL, RuntimeValue } from "./values";
 
 export function setupGlobalScope() {
   const env = new Environment();
@@ -6,6 +6,17 @@ export function setupGlobalScope() {
   env.declareVariable("false", M_BOOL(false), true);
 
   env.declareVariable("null", M_NULL(), true);
+
+  // native functions
+
+  env.declareVariable(
+    "print",
+    M_NATIVE_FUNC((args, scope) => {
+      console.log(...args);
+      return M_NULL();
+    }),
+    true,
+  );
 
   return env;
 }

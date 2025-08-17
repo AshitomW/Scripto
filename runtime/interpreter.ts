@@ -1,6 +1,7 @@
 import {
   AssignmentExpression,
   BinaryExpression,
+  CallExpression,
   Identifier,
   NumericLiteral,
   ObjectLiteral,
@@ -11,6 +12,7 @@ import {
 import Environment from "./environment";
 import {
   interpret_binary_expression,
+  interpret_call_expression,
   interpret_object_expression,
 } from "./interpreters/expression";
 import {
@@ -53,6 +55,8 @@ export function interpret(ASTNode: Statement, env: Environment): RuntimeValue {
         env,
       );
       break;
+    case "CallExpression":
+      return interpret_call_expression(ASTNode as CallExpression, env);
     case "AssignmentExpression":
       return interpret_assignment(ASTNode as AssignmentExpression, env);
       break;
