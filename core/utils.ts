@@ -9,5 +9,5 @@ export function isNumeric(str: string) {
 }
 
 export function isOptional(str: string) {
-  return str == " " || str == "\n" || str == "\t";
+  return str == " " || str == "\n" || str == "\t" || str == "\r";
 }

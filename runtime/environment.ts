@@ -1,9 +1,13 @@
 import { M_BOOL, M_NULL, RuntimeValue } from "./values";
 
-function setupScope(env: Environment) {
+export function setupGlobalScope() {
+  const env = new Environment();
   env.declareVariable("true", M_BOOL(true), true);
   env.declareVariable("false", M_BOOL(false), true);
+
   env.declareVariable("null", M_NULL(), true);
+
+  return env;
 }
 
 // Hold structure for scopes
@@ -16,10 +20,6 @@ export default class Environment {
     this.parent = parentEnv;
     this.variables = new Map();
     this.constants = new Set();
-
-    if (global) {
-      setupScope(this);
-    }
   }
 
   public declareVariable(

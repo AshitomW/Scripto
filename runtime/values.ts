@@ -1,9 +1,7 @@
 // Define the types that are used for runtime.
-// At runtime , no way to know if null , object, boolean , etc.
-
 import { Runtime } from "inspector/promises";
 
-export type ValueType = "null" | "number" | "boolean";
+export type ValueType = "null" | "number" | "boolean" | "object";
 
 export interface RuntimeValue {
   type: ValueType;
@@ -21,6 +19,11 @@ export interface NumberValue extends RuntimeValue {
 export interface BooleanValue extends RuntimeValue {
   type: "boolean";
   value: boolean;
+}
+
+export interface ObjectValue extends RuntimeValue {
+  type: "object";
+  properties: Map<string, RuntimeValue>;
 }
 
 export function M_NUMBER(n = 0) {

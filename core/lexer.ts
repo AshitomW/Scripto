@@ -14,6 +14,11 @@ export enum TokenType {
   ParenClose,
   BinaryOperator,
   SEMICOLON,
+  PROPASSIGN, // <-
+  COMMA, // ,
+  OpenBrace, // {
+  CloseBrace, // }
+
   // Keywords ??
   LET,
   CONST,
@@ -48,6 +53,12 @@ export function Tokenize(source_code: string): Token[] {
       case ")":
         tokens.push(make_token(src.shift(), TokenType.ParenClose));
         break;
+      case "{":
+        tokens.push(make_token(src.shift(), TokenType.OpenBrace));
+        break;
+      case "}":
+        tokens.push(make_token(src.shift(), TokenType.CloseBrace));
+        break;
       case "+":
       case "-":
       case "*":
@@ -62,8 +73,16 @@ export function Tokenize(source_code: string): Token[] {
       case ";":
         tokens.push(make_token(src.shift(), TokenType.SEMICOLON));
         break;
+      case ",":
+        tokens.push(make_token(src.shift(), TokenType.COMMA));
       default:
         // Handle Multiple Characters Token , <= , -> , let
+
+        if (src[0] === ":" && src[1] === "=") {
+          src.shift();
+          src.shift();
+          tokens.push(make_token(":=", TokenType.PROPASSIGN));
+        }
 
         if (isNumeric(src[0])) {
           let num = "";

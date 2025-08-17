@@ -2,20 +2,17 @@ import Parser from "./core/parser";
 import { inspect } from "util";
 import readline from "readline";
 import { interpret } from "./runtime/interpreter";
-import Environment from "./runtime/environment";
+import Environment, { setupGlobalScope } from "./runtime/environment";
 import { M_BOOL, M_NULL, M_NUMBER, NumberValue } from "./runtime/values";
 import { promises as fs } from "fs";
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
 
 async function execute(filename: string) {
   const parser = new Parser();
-  const env = new Environment();
+  const env = setupGlobalScope();
 
   const source = await fs.readFile(filename, "utf8");
   const program = parser.generateAST(source);
+
   const result = interpret(program, env);
 
   console.log(result);
@@ -23,6 +20,7 @@ async function execute(filename: string) {
 
 execute("./examples/example.txt");
 
+/*
 function repl() {
   const parser = new Parser();
   const env = new Environment();
@@ -49,3 +47,4 @@ function repl() {
 
   ask();
 }
+*/

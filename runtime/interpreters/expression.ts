@@ -1,7 +1,13 @@
-import { BinaryExpression } from "../../core/ast";
+import { BinaryExpression, ObjectLiteral } from "../../core/ast";
 import Environment from "../environment";
 import { interpret } from "../interpreter";
-import { M_NULL, NullValue, NumberValue, RuntimeValue } from "../values";
+import {
+  M_NULL,
+  NullValue,
+  NumberValue,
+  ObjectValue,
+  RuntimeValue,
+} from "../values";
 
 export function interpret_binary_expression(
   binExp: BinaryExpression,
@@ -53,4 +59,19 @@ function interpret_numeric_binary_expression(
       break;
   }
   return { value: accumulator, type: "number" };
+}
+
+export function interpret_object_expression(
+  obj: ObjectLiteral,
+  env: Environment,
+): RuntimeValue {
+  const object = { type: "object", properties: new Map() } as ObjectValue;
+  for (const { key, value } of obj.properties) {
+    const runtimeValue =
+      value == undefined ? env.lookUpVariable(key) : interpret(value, env);
+
+    object.properties.set(key, runtimeValue);
+  }
+
+  return object;
 }

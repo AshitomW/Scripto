@@ -4,7 +4,8 @@ export type NodeType =
   | "Program"
   | "VariableDeclaration"
   | "AssignmentExpression"
-
+  | "Property"
+  | "ObjectLiteral"
   // Expressions
   | "Numeric Literal"
   | "Identifier"
@@ -49,6 +50,17 @@ export interface Identifier extends Expression {
 export interface NumericLiteral extends Expression {
   kind: "Numeric Literal";
   value: number;
+}
+
+export interface Property extends Expression {
+  kind: "Property";
+  key: string;
+  value?: Expression; // Optional For Shorthand Syntax {key}
+}
+
+export interface ObjectLiteral extends Expression {
+  kind: "ObjectLiteral";
+  properties: Property[];
 }
 
 // ------------

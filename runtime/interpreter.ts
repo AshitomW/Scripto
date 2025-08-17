@@ -3,12 +3,16 @@ import {
   BinaryExpression,
   Identifier,
   NumericLiteral,
+  ObjectLiteral,
   Program,
   Statement,
   VariableDeclaration,
 } from "../core/ast";
 import Environment from "./environment";
-import { interpret_binary_expression } from "./interpreters/expression";
+import {
+  interpret_binary_expression,
+  interpret_object_expression,
+} from "./interpreters/expression";
 import {
   interpret_assignment,
   interpret_identifier,
@@ -36,6 +40,9 @@ export function interpret(ASTNode: Statement, env: Environment): RuntimeValue {
       break;
     case "Identifier":
       return interpret_identifier(ASTNode as Identifier, env);
+      break;
+    case "ObjectLiteral":
+      return interpret_object_expression(ASTNode as ObjectLiteral, env);
       break;
     case "Program":
       return interpret_program(ASTNode as Program, env);
