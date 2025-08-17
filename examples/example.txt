@@ -1,5 +1,15 @@
-let point = {
-  x := 100,
-  y := 200,
+let func = 300;
+const point = {
+  x:=10,
+  y:=3,
+  func:= func,
+  complex:={
+    imaginary:=false,
+  },
 };
+
+
+writeline(45/2*2)
+foo = point.func(abc(1,2),5)
+
 

@@ -14,10 +14,14 @@ export enum TokenType {
   ParenClose,
   BinaryOperator,
   SEMICOLON,
-  PROPASSIGN, // <-
+  PROPASSIGN, // :=
   COMMA, // ,
   OpenBrace, // {
   CloseBrace, // }
+  DOT,
+
+  OpenBracket, // [
+  CloseBracket, // ]
 
   // Keywords ??
   LET,
@@ -59,6 +63,15 @@ export function Tokenize(source_code: string): Token[] {
       case "}":
         tokens.push(make_token(src.shift(), TokenType.CloseBrace));
         break;
+      case "[":
+        tokens.push(make_token(src.shift(), TokenType.OpenBracket));
+        break;
+      case "]":
+        tokens.push(make_token(src.shift(), TokenType.CloseBracket));
+        break;
+      case ".":
+        tokens.push(make_token(src.shift(), TokenType.DOT));
+        break;
       case "+":
       case "-":
       case "*":
@@ -82,6 +95,7 @@ export function Tokenize(source_code: string): Token[] {
           src.shift();
           src.shift();
           tokens.push(make_token(":=", TokenType.PROPASSIGN));
+          continue;
         }
 
         if (isNumeric(src[0])) {
@@ -107,7 +121,7 @@ export function Tokenize(source_code: string): Token[] {
         } else if (isOptional(src[0])) {
           src.shift();
         } else {
-          console.log("Character Not Recognizable : ", src[0]);
+          console.log("Character Not Recognizable -> ", src[0]);
           exit(1);
         }
     }
