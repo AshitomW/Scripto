@@ -26,7 +26,6 @@ foo = foo / 4 + 5;
 ```scripto
 func add(x, y) {
   let sum = x + y;
-  return sum;
 }
 
 const result = add(1, 4);
