@@ -2,6 +2,7 @@ import {
   AssignmentExpression,
   BinaryExpression,
   CallExpression,
+  FunctionDeclaration,
   Identifier,
   NumericLiteral,
   ObjectLiteral,
@@ -17,9 +18,10 @@ import {
 } from "./interpreters/expression";
 import {
   interpret_assignment,
+  interpret_function_declaration,
   interpret_identifier,
   interpret_variable_declaration,
-} from "./interpreters/variables";
+} from "./interpreters/statements";
 import { M_NULL, M_NUMBER, RuntimeValue } from "./values";
 
 function interpret_program(program: Program, env: Environment): RuntimeValue {
@@ -52,7 +54,13 @@ export function interpret(ASTNode: Statement, env: Environment): RuntimeValue {
     case "VariableDeclaration":
       return interpret_variable_declaration(
         ASTNode as VariableDeclaration,
-        env,
+        env
+      );
+      break;
+    case "FunctionDeclaration":
+      return interpret_function_declaration(
+        ASTNode as FunctionDeclaration,
+        env
       );
       break;
     case "CallExpression":

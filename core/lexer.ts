@@ -26,12 +26,14 @@ export enum TokenType {
   // Keywords ??
   LET,
   CONST,
+  FUNC,
   EOF, // End Of File
 }
 
 const KEYWORDS: Record<string, TokenType> = {
   let: TokenType.LET,
   const: TokenType.CONST,
+  func: TokenType.FUNC,
 };
 
 export interface Token {

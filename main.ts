@@ -12,14 +12,14 @@ async function execute(filename: string) {
 
   const source = await fs.readFile(filename, "utf8");
   const program = parser.generateAST(source);
-  /* console.log(
-     inspect(program, { showHidden: false, depth: null, colors: true }),
-   );
-   */
+  // console.log(
+  //   inspect(program, { showHidden: false, depth: null, colors: true })
+  // );
+
   const result = interpret(program, env);
 }
 
-execute("./examples/example_two.txt");
+execute("./examples/example_three.txt");
 
 /*
 function repl() {

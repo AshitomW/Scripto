@@ -1,15 +1,16 @@
 import {
   AssignmentExpression,
+  FunctionDeclaration,
   Identifier,
   VariableDeclaration,
 } from "../../core/ast";
 import Environment from "../environment";
 import { interpret } from "../interpreter";
-import { M_NULL, RuntimeValue } from "../values";
+import { FunctionValue, M_NULL, RuntimeValue } from "../values";
 
 export function interpret_identifier(
   idt: Identifier,
-  env: Environment,
+  env: Environment
 ): RuntimeValue {
   const val = env.lookUpVariable(idt.symbol);
   return val;
@@ -17,7 +18,7 @@ export function interpret_identifier(
 
 export function interpret_variable_declaration(
   declr: VariableDeclaration,
-  env: Environment,
+  env: Environment
 ): RuntimeValue {
   const value = declr.value ? interpret(declr.value, env) : M_NULL();
   return env.declareVariable(declr.identifier, value, declr.constant);
@@ -25,7 +26,7 @@ export function interpret_variable_declaration(
 
 export function interpret_assignment(
   node: AssignmentExpression,
-  env: Environment,
+  env: Environment
 ): RuntimeValue {
   if (node.assignee.kind !== "Identifier")
     throw `Invalid LHS Assignment! ${JSON.stringify(node.assignee)}`;
@@ -33,4 +34,19 @@ export function interpret_assignment(
   const varname = (node.assignee as Identifier).symbol;
 
   return env.assignVariable(varname, interpret(node.value, env));
+}
+
+export function interpret_function_declaration(
+  declr: FunctionDeclaration,
+  env: Environment
+): RuntimeValue {
+  const func = {
+    type: "Function",
+    name: declr.name,
+    parameters: declr.parameters,
+    declarationEnvironment: env,
+    body: declr.body,
+  } as FunctionValue;
+
+  return env.declareVariable(declr.name, func, true);
 }

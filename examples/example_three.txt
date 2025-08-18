@@ -1,0 +1,6 @@
+func add(x,y){
+  let sum = x+y;
+}
+
+
+print(add(2,3))

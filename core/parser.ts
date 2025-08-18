@@ -11,6 +11,7 @@ import {
   ObjectLiteral,
   CallExpression,
   MemberExpression,
+  FunctionDeclaration,
 } from "./ast";
 import { Tokenize, Token, TokenType } from "./lexer";
 
@@ -49,10 +50,54 @@ export default class Parser {
       case TokenType.LET:
       case TokenType.CONST:
         return this.parse_variable_declaration();
-
+        break;
+      case TokenType.FUNC:
+        return this.parse_function_declaration();
+        break;
       default:
         return this.parse_expression();
     }
+  }
+  private parse_function_declaration(): Statement {
+    this.eat();
+    const name = this.expect(
+      TokenType.Identifier,
+      "Expected Function Name Following func keyword"
+    ).value;
+
+    const args = this.parse_arguments();
+    console.log(args);
+    const params: string[] = [];
+    for (const arg of args) {
+      if (arg.kind !== "Identifier") {
+        console.log(arg);
+        throw "Expected Parameters Needs To Be A String";
+      }
+      params.push((arg as Identifier).symbol);
+    }
+
+    this.expect(
+      TokenType.OpenBrace,
+      "Expected Function Body After Declaration"
+    );
+
+    const body: Statement[] = [];
+    while (
+      this.currentToken().type !== TokenType.EOF &&
+      this.currentToken().type !== TokenType.CloseBrace
+    ) {
+      body.push(this.parse_statement());
+    }
+
+    this.expect(TokenType.CloseBrace, "Closing Bracket Expected");
+    const func = {
+      body,
+      name,
+      parameters: params,
+      kind: "FunctionDeclaration",
+    } as FunctionDeclaration;
+
+    return func;
   }
 
   private parse_variable_declaration(): Statement {
@@ -60,7 +105,7 @@ export default class Parser {
     const isConstant = this.eat().type == TokenType.CONST;
     const identifier = this.expect(
       TokenType.Identifier,
-      "Expecting Identifier Name Following Declaration Keywords",
+      "Expecting Identifier Name Following Declaration Keywords"
     ).value;
 
     if (this.currentToken().type == TokenType.SEMICOLON) {
@@ -79,7 +124,7 @@ export default class Parser {
 
     this.expect(
       TokenType.Equals,
-      "Expected Equals Token Following Identifier In Variable Declaration",
+      "Expected Equals Token Following Identifier In Variable Declaration"
     );
 
     const declr = {
@@ -91,7 +136,7 @@ export default class Parser {
 
     this.expect(
       TokenType.SEMICOLON,
-      "Statements must be terminated with semicolons",
+      "Statements must be terminated with semicolons"
     );
 
     return declr;
@@ -118,7 +163,7 @@ export default class Parser {
       */
       const key = this.expect(
         TokenType.Identifier,
-        "Object Literal Key Expected",
+        "Object Literal Key Expected"
       ).value;
 
       // {key,key}
@@ -140,7 +185,7 @@ export default class Parser {
       // ---- BP
       this.expect(
         TokenType.PROPASSIGN,
-        "Missing <- following identifier in Object Expression",
+        "Missing <- following identifier in Object Expression"
       );
       // -----
       const value = this.parse_expression();
@@ -149,13 +194,13 @@ export default class Parser {
       if (this.currentToken().type != TokenType.CloseBrace) {
         this.expect(
           TokenType.COMMA,
-          "Expected Comma Or Closing Bracket Following A Property",
+          "Expected Comma Or Closing Bracket Following A Property"
         );
       }
     }
     this.expect(
       TokenType.CloseBrace,
-      `Object Literal is missing a closing brace`,
+      `Object Literal is missing a closing brace`
     );
     return { kind: "ObjectLiteral", properties } as ObjectLiteral;
   }
@@ -276,7 +321,7 @@ export default class Parser {
 
     this.expect(
       TokenType.ParenClose,
-      "Missing Closing Paranthesis in argument list",
+      "Missing Closing Paranthesis in argument list"
     );
 
     return args;
@@ -317,7 +362,7 @@ export default class Parser {
         property = this.parse_expression();
         this.expect(
           TokenType.CloseBracket,
-          "Missing Closing Bracket In Property Access",
+          "Missing Closing Bracket In Property Access"
         );
       }
 
@@ -350,13 +395,13 @@ export default class Parser {
         const value = this.parse_expression();
         this.expect(
           TokenType.ParenClose,
-          "Unexpected Token Found Inside Parenthesised Expression. Expected Closing Parenthesis",
+          "Unexpected Token Found Inside Parenthesised Expression. Expected Closing Parenthesis"
         ); // Remove the closing parenthesis;
         return value;
       default:
         console.error(
           "Unexpected Token Found During Parsing",
-          this.currentToken(),
+          this.currentToken()
         );
         process.exit(1);
     }
